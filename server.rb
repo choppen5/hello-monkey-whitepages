@@ -26,8 +26,10 @@ end
  
 
  
-post '/voice' do
+post '/dial' do
+    #determine if call is inbound
     number = params[:PhoneNumber] 
+
     response = Twilio::TwiML::Response.new do |r|
         # Should be your Twilio Number or a verified Caller ID
         r.Dial :callerId => caller_id do |d|
@@ -43,3 +45,20 @@ post '/voice' do
     end
     response.text
 end
+
+#this will be called from a Twilio voice URL
+#for inbound calls, dial the default_client
+post '/inbound' do
+
+    from = params[:From] 
+    
+    response = Twilio::TwiML::Response.new do |r|
+        # Should be your Twilio Number or a verified Caller ID
+        r.Dial :callerId => from do |d|
+            d.Client default_client
+        end
+    end
+    response.text
+end
+
+
