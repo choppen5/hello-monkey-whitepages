@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'sinatra'
 require 'twilio-ruby'
+require 'httparty'
  
 # put your default Twilio Client name here, for when a phone number isn't given
 default_client = "charles"
@@ -21,7 +22,7 @@ get '/' do
     capability.allow_client_outgoing appsid
     capability.allow_client_incoming client_name
     token = capability.generate
-    erb :index, :locals => {:token => token, :client_name => client_name}
+    erb :index, :locals => {:token => token, :client_name => client_name, :caller_id=> caller_id}
 end
  
 
@@ -51,7 +52,7 @@ end
 post '/inbound' do
 
     from = params[:From] 
-    
+
     response = Twilio::TwiML::Response.new do |r|
         # Should be your Twilio Number or a verified Caller ID
         r.Dial :callerId => from do |d|
@@ -61,4 +62,40 @@ post '/inbound' do
     response.text
 end
 
+post '/getname' do
+    callerId = params[:callerId]
+    name = getnamefromwhitepages(callerId)
+    return name
+end
+
+
+def getnamefromwhitepages (phone)
+  base_uri = "http://proapi.whitepages.com/"
+  version = "2.0/" 
+  api_key = ENV['whitepages_api_key']
+  #phone = "4157679039"
+
+  request_url = base_uri + version + "phone.json?phone="+ phone  +"&api_key="+api_key
+  response = HTTParty.get(URI.escape(request_url))
+
+  result = response['results'][0] #get the first result
+  dictionarykey = response['dictionary'][result]
+
+  #TODO check that there is at least one result, else return error
+  if dictionarykey['belongs_to'][0]
+      belongsto = dictionarykey['belongs_to'][0]['id']['key']
+      person = response['dictionary'][belongsto]
+      firstname = person['names'][0]['first_name']
+      lastname = person['names'][0]['last_name']
+      name = "#{firstname} #{lastname}"
+      #puts "result = #{result} and dictionarykey = #{dictionarykey} and belongsto = #{belongsto} and first name = #{firstname} and lastname = #{lastname}"
+      
+      puts "name = #{name}"
+      return name  
+  else
+      #return same number, since we didn't find any name here
+      return phone
+  end
+
+end 
 

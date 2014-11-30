@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Hello Client Monkey 5</title>
+    <title>White Pages CallerId</title>
     <script type="text/javascript"
       src="//static.twilio.com/libs/twiliojs/1.2/twilio.min.js"></script>
     <script type="text/javascript"
@@ -9,12 +9,21 @@
     </script>
     <link href="//static0.twilio.com/packages/quickstart/client.css"
       type="text/css" rel="stylesheet" />
+    <style>
+    #log {
+      font:  30px/normal sans-serif;
+    }
+
+    </style> 
+
+
     <script type="text/javascript">
   
+    var globalConn; //stores live connection 
     Twilio.Device.setup("<%= token %>", {debug: true});
   
       Twilio.Device.ready(function (device) {
-        $("#log").text("Client '<%= client_name %>' is ready");
+        $("#log").text("Client is ready");
       });
   
       Twilio.Device.error(function (error) {
@@ -30,15 +39,18 @@
       });
   
       Twilio.Device.incoming(function (conn) {
-        $("#log").text("Incoming connection from " + conn.parameters.From);
-        // accept the incoming connection and start two-way audio
-        conn.accept();
+        // set the globalConn
+        $("#log").text("Getting name from Whitepages...");
+        globalConn = conn;
+        // fetch caller name from Whitepages API
+        $.post("getname", {callerId: conn.parameters.From}, function (data) {
+            $("#log").text("Call from: " + data);
+        });
       });
   
-      function call() {
-        // get the phone number or client to connect the call to
-        params = {"PhoneNumber": $("#number").val()};
-        Twilio.Device.connect(params);
+      function answer() {
+        // answer the call
+        globalConn.accept();
       }
   
       function hangup() {
@@ -47,17 +59,26 @@
     </script>
   </head>
   <body>
-    <button class="call" onclick="call();">
-      Call
-    </button>
   
+    <div>
+    <a href="http://pro.whitepages.com/"><img src="http://pro.whitepages.com/wp-content/uploads/2014/09/wp-logo-large.png" width="237" height="47"></a>
+    </div>
+    <div>
+      <br>
+      PLUS
+    </div>
+
+    <button class="call" onclick="answer();">
+      Answer
+    </button>
+
     <button class="hangup" onclick="hangup();">
       Hangup
     </button>
+
+    <div id="log">Starting up....</div>
+    <div style="font: 24px"> Call: <%= caller_id %> </div>
+
   
-    <input type="text" id="number" name="number"
-      placeholder="Enter a phone number or client to call"/>
-  
-    <div id="log">Loading pigeons...</div>
   </body>
 </html>
