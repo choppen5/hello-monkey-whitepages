@@ -19,7 +19,8 @@
 
     <script type="text/javascript">
   
-    var globalConn; //stores live connection 
+    var globalConn; //stores live connection
+    var globalName; //stores name  
     Twilio.Device.setup("<%= token %>", {debug: true});
   
       Twilio.Device.ready(function (device) {
@@ -31,11 +32,15 @@
       });
   
       Twilio.Device.connect(function (conn) {
-        $("#log").text("Successfully established call");
+        $("#log").text("On call with: " + globalName);
       });
   
       Twilio.Device.disconnect(function (conn) {
         $("#log").text("Call ended");
+      });
+
+      Twilio.Device.cancel(function (conn) {
+        $("#log").text("Call missed");
       });
   
       Twilio.Device.incoming(function (conn) {
@@ -44,9 +49,13 @@
         globalConn = conn;
         // fetch caller name from Whitepages API
         $.post("getname", {callerId: conn.parameters.From}, function (data) {
+            globalName = data;
             $("#log").text("Call from: " + data);
+            $("<li>", {id: conn.Id, text: data}).prependTo("#people");
         });
       });
+
+
   
       function answer() {
         // answer the call
@@ -61,7 +70,7 @@
   <body>
   
     <div>
-    <a href="http://pro.whitepages.com/"><img src="http://pro.whitepages.com/wp-content/uploads/2014/09/wp-logo-large.png" width="237" height="47"></a>
+    <a href="http://pro.whitepages.com/"><img src="//pro.whitepages.com/wp-content/uploads/2014/09/wp-logo-large.png" width="237" height="47"></a>
     </div>
     <div>
       <br>
@@ -77,8 +86,9 @@
     </button>
 
     <div id="log">Starting up....</div>
-    <div style="font: 24px"> Call: <%= caller_id %> </div>
-
+    <div style="font:24px"> Call: <%= caller_id %> </div>
+    
+    <ul id="people"/>
   
   </body>
 </html>
