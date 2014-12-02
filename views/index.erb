@@ -5,14 +5,71 @@
     <script type="text/javascript"
       src="//static.twilio.com/libs/twiliojs/1.2/twilio.min.js"></script>
     <script type="text/javascript"
-      src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js">
+      src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+
+    <script type="text/javascript"
+      src="scripts/jquery-template/jquery.loadTemplate-1.4.5.js">
     </script>
     <link href="//static0.twilio.com/packages/quickstart/client.css"
       type="text/css" rel="stylesheet" />
     <style>
+    
     #log {
       font:  30px/normal sans-serif;
     }
+    
+
+
+.caller_profile_text {
+  font-family: 'PT Sans', sans-serif;
+  overflow:auto;
+  color:#EDEDED;
+  background:rgba(0,0,0,0.5);
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,.5);
+  text-shadow: 1px 1px 0 rgba(0,0,0,.8);
+  padding:14px;
+  vertical-align:middle;
+  }
+
+.caller_profile_label {
+  font-family: 'PT Sans', sans-serif;
+  width: 60px;
+  float: left;
+  text-align: left;
+  display: block;
+  font-weight:bold;
+  }
+
+.caller_profile_text span {
+  margin:0 0 0 14px;
+  padding:3px 8px;
+  }
+  
+.caller_profile_vcard p {
+  margin:0 0 10px;
+  height:14px;
+  text-align: left;
+  border-radius:12px;
+  }
+
+.caller_profile {
+  margin:25px auto 0 auto;
+  width:450px;
+  -webkit-animation-name: fade-in;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-timing-function: linear;
+  -webkit-animation-iteration-count: 1;
+  letter-spacing:.1em;
+  }
+
+  
+  button.call, button.hangup {
+      margin: 200px 0 0 0;
+  }
 
     </style> 
 
@@ -24,7 +81,7 @@
     Twilio.Device.setup("<%= token %>", {debug: true});
   
       Twilio.Device.ready(function (device) {
-        $("#log").text("Client is ready");
+        $("#log").text("Ready");
       });
   
       Twilio.Device.error(function (error) {
@@ -49,9 +106,12 @@
         globalConn = conn;
         // fetch caller name from Whitepages API
         $.post("getname", {callerId: conn.parameters.From}, function (data) {
-            globalName = data;
-            $("#log").text("Call from: " + data);
-            $("<li>", {id: conn.Id, text: data}).prependTo("#people");
+            data = jQuery.parseJSON(data);
+            globalName = data.name;
+            $("#log").text("Call from: " + data.name);
+            $(".script-template-container").loadTemplate($("#template"), data);
+
+            $("<li>", {id: conn.Id, text: data.name}).prependTo("#people");
         });
       });
 
@@ -65,6 +125,10 @@
       function hangup() {
         Twilio.Device.disconnectAll();
       }
+
+      function addcaller() {
+      }
+
     </script>
   </head>
   <body>
@@ -73,7 +137,7 @@
     <a href="http://pro.whitepages.com/"><img src="//pro.whitepages.com/wp-content/uploads/2014/09/wp-logo-large.png" width="237" height="47"></a>
     </div>
     <div>
-      <br>
+      <br/>
       PLUS
     </div>
 
@@ -86,8 +150,30 @@
     </button>
 
     <div id="log">Starting up....</div>
-    <div style="font:24px"> Call: <%= caller_id %> </div>
     
+
+    <div class="script-template-container">     </div>
+    
+    <script type="text/html" id="template">
+      <div class='caller_profile'>
+        <p class='call_title'>Caller Profile</p> 
+        <div class="caller_profile_vcard vcard">
+         <div class="caller_profile_text">
+          <p><label class="caller_profile_label">Number:</label>   <span class="fn editable" id="profile_edit_name" data-content="number"></span></p> 
+           <p><label class="caller_profile_label">Name:</label>   <span class="fn editable" id="profile_edit_name" data-content="name"></span></p>
+           <p><label class="caller_profile_label">Phone:</label>   <span class="fn editable" id="profile_edit_name" data-content="phonetype"></span></p>
+           <p><label class="caller_profile_label">Carrier:</label>   <span class="fn editable" id="profile_edit_name" data-content="carrier"></span></p>
+           <p><label class="caller_profile_label">Type:</label>   <span class="fn editable" id="profile_edit_name" data-content="persontype"></span></p>
+           <p><label class="caller_profile_label">Addrress:</label>   <span class="fn editable" id="profile_edit_name" data-content="address"></span></p>
+           <p><label class="caller_profile_label">City:</label>   <span class="fn editable" id="profile_edit_name" data-content="city"></span></p>
+           <p><label class="caller_profile_label">Zip:</label>   <span class="fn editable" id="profile_edit_name" data-content="postal_code"></span></p>
+         </div>
+        </div>
+      </div>  
+      </script>
+     
+
+    </script>   
     <ul id="people"/>
   
   </body>

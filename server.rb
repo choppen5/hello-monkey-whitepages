@@ -70,32 +70,70 @@ end
 
 
 def getnamefromwhitepages (phone)
-  base_uri = "http://proapi.whitepages.com/"
-  version = "2.0/" 
-  api_key = ENV['whitepages_api_key']
-  #phone = "4157679039"
+   
+   base_uri = "http://proapi.whitepages.com/"
+   version = "2.0/" 
+   api_key = ENV['whitepages_api_key']  
+
+   #the whitepagesobject will be returned with availible info.. bare minimum phone
+   whitepagesobject = {
+    :number => phone,
+    :name => phone,
+    :firstname => "",
+    :lastname => "",
+    :persontype     => "",
+    :phonetype  => "",
+    :carrier  =>  "",
+    :address  =>  "" ,
+    :city     =>  "",
+    :postal_code => "",
+    :lattitude => "",
+    :longitude=> "" }
 
   request_url = base_uri + version + "phone.json?phone="+ phone  +"&api_key="+api_key
   response = HTTParty.get(URI.escape(request_url))
 
-  result = response['results'][0] #get the first result
-  dictionarykey = response['dictionary'][result]
+  result = response['results'][0] #get the first result assume it alsway a phone
+  
+  if result 
+    dictionarykeyphone = response['dictionary'][result]
+    whitepagesobject[:phonetype] = dictionarykeyphone['line_type']
+    whitepagesobject[:carrier]   = dictionarykeyphone['carrier']
 
-  #TODO check that there is at least one result, else return error
-  if dictionarykey['belongs_to'][0]
-      belongsto = dictionarykey['belongs_to'][0]['id']['key']
-      person = response['dictionary'][belongsto]
-      firstname = person['names'][0]['first_name']
-      lastname = person['names'][0]['last_name']
-      name = "#{firstname} #{lastname}"
-      #puts "result = #{result} and dictionarykey = #{dictionarykey} and belongsto = #{belongsto} and first name = #{firstname} and lastname = #{lastname}"
+    if dictionarykeyphone['belongs_to'][0]
+
+      whitepagesobject[:persontype]= dictionarykeyphone['belongs_to'][0]['id']['type'] 
+
+      belongstoKey = dictionarykeyphone['belongs_to'][0]['id']['key']
+      puts "belongstoKey = #{belongstoKey}"
       
-      puts "name = #{name}"
-      return name  
-  else
-      #return same number, since we didn't find any name here
-      return phone
+      belongstoObject = response['dictionary'][belongstoKey]  #retrieve 
+      if belongstoObject
+        if whitepagesobject[:persontype] == "Person"          
+          whitepagesobject[:firstname] = belongstoObject['names'][0]['first_name']  #TODO: This can error if there is no first_name
+          whitepagesobject[:lastname]  = belongstoObject['names'][0]['last_name']
+          whitepagesobject[:name] = "#{whitepagesobject[:firstname]} #{whitepagesobject[:lastname]}" 
+        elsif whitepagesobject[:persontype] == "Business"
+          whitepagesobject[:name]  = belongstoObject['id'][0]['name']
+        end
+
+      end  
+    end
+
+
+    locationKey = dictionarykeyphone['associated_locations'][0]['id']['key']
+    locationObject = response['dictionary'][locationKey]  #retrieve best location
+
+    if locationObject
+      whitepagesobject[:address] = locationObject['address']
+      whitepagesobject[:city] = locationObject['city']
+      whitepagesobject[:postal_code] = locationObject['postal_code']
+      whitepagesobject[:lattitude] = locationObject['lat_long']['latitude']
+      whitepagesobject[:longitude] = locationObject['lat_long']['longitude']
+    end  
+
   end
+  return whitepagesobject.to_json
 
 end 
 
