@@ -88,7 +88,8 @@ def getnamefromwhitepages (phone)
     :city     =>  "",
     :postal_code => "",
     :lattitude => "",
-    :longitude=> "" }
+    :longitude=> "",
+    :state=> "" }
 
   request_url = base_uri + version + "phone.json?phone="+ phone  +"&api_key="+api_key
   response = HTTParty.get(URI.escape(request_url))
@@ -127,6 +128,7 @@ def getnamefromwhitepages (phone)
     if locationObject
       whitepagesobject[:address] = locationObject['address']
       whitepagesobject[:city] = locationObject['city']
+      whitepagesobject[:state] = locationObject['state_code']
       whitepagesobject[:postal_code] = locationObject['postal_code']
       whitepagesobject[:lattitude] = locationObject['lat_long']['latitude']
       whitepagesobject[:longitude] = locationObject['lat_long']['longitude']

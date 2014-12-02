@@ -10,66 +10,9 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
 
-    <script type="text/javascript"
-      src="scripts/jquery-template/jquery.loadTemplate-1.4.5.js">
-    </script>
-    <link href="//static0.twilio.com/packages/quickstart/client.css"
+    <link href="css/client.css"
       type="text/css" rel="stylesheet" />
     <style>
-    
-    #log {
-      font:  30px/normal sans-serif;
-    }
-    
-
-
-.caller_profile_text {
-  font-family: 'PT Sans', sans-serif;
-  overflow:auto;
-  color:#EDEDED;
-  background:rgba(0,0,0,0.5);
-  border-radius:12px;
-  border:1px solid rgba(0,0,0,.5);
-  text-shadow: 1px 1px 0 rgba(0,0,0,.8);
-  padding:14px;
-  vertical-align:middle;
-  }
-
-.caller_profile_label {
-  font-family: 'PT Sans', sans-serif;
-  width: 60px;
-  float: left;
-  text-align: left;
-  display: block;
-  font-weight:bold;
-  }
-
-.caller_profile_text span {
-  margin:0 0 0 14px;
-  padding:3px 8px;
-  }
-  
-.caller_profile_vcard p {
-  margin:0 0 10px;
-  height:14px;
-  text-align: left;
-  border-radius:12px;
-  }
-
-.caller_profile {
-  margin:25px auto 0 auto;
-  width:450px;
-  -webkit-animation-name: fade-in;
-  -webkit-animation-duration: 1s;
-  -webkit-animation-timing-function: linear;
-  -webkit-animation-iteration-count: 1;
-  letter-spacing:.1em;
-  }
-
-  
-  button.call, button.hangup {
-      margin: 200px 0 0 0;
-  }
 
     </style> 
 
@@ -94,10 +37,13 @@
   
       Twilio.Device.disconnect(function (conn) {
         $("#log").text("Call ended");
+        $(".script-template-container").hide();
+
       });
 
       Twilio.Device.cancel(function (conn) {
         $("#log").text("Call missed");
+        $(".script-template-container").hide();
       });
   
       Twilio.Device.incoming(function (conn) {
@@ -109,12 +55,33 @@
             data = jQuery.parseJSON(data);
             globalName = data.name;
             $("#log").text("Call from: " + data.name);
-            $(".script-template-container").loadTemplate($("#template"), data);
+            //$(".script-template-container").loadTemplate($("#template"), data);
 
-            $("<li>", {id: conn.Id, text: data.name}).prependTo("#people");
+            showCaller(data);
+
+            $("<li>", {id: conn.Id, text: data.name}).click(function () {
+                showCaller(data);
+             }).prependTo("#people");
         });
       });
 
+      function showCaller (data) {
+
+            var source   = $("#template").html();
+            var template = Handlebars.compile(source);
+            var context = data;
+            var html    = template(context);
+            $(".script-template-container").html(html);
+            $(".script-template-container").show();
+            $("#calllog").click( function() {
+                $(".script-template-container").hide();
+            }); 
+
+      }
+
+      function hideCaller () {
+          $(".script-template-container").hide();
+      }
 
   
       function answer() {
@@ -154,27 +121,31 @@
 
     <div class="script-template-container">     </div>
     
-    <script type="text/html" id="template">
+    <script type="text/x-handlebars-template" id="template">
       <div class='caller_profile'>
-        <p class='call_title'>Caller Profile</p> 
-        <div class="caller_profile_vcard vcard">
+        <div class="caller_profile_vcard vcard" style="background-image:url('//maps.googleapis.com/maps/api/staticmap?zoom=12&size=450x165&sensor=false&center={{city}},{{state}}.png')">
          <div class="caller_profile_text">
-          <p><label class="caller_profile_label">Number:</label>   <span class="fn editable" id="profile_edit_name" data-content="number"></span></p> 
-           <p><label class="caller_profile_label">Name:</label>   <span class="fn editable" id="profile_edit_name" data-content="name"></span></p>
-           <p><label class="caller_profile_label">Phone:</label>   <span class="fn editable" id="profile_edit_name" data-content="phonetype"></span></p>
-           <p><label class="caller_profile_label">Carrier:</label>   <span class="fn editable" id="profile_edit_name" data-content="carrier"></span></p>
-           <p><label class="caller_profile_label">Type:</label>   <span class="fn editable" id="profile_edit_name" data-content="persontype"></span></p>
-           <p><label class="caller_profile_label">Addrress:</label>   <span class="fn editable" id="profile_edit_name" data-content="address"></span></p>
-           <p><label class="caller_profile_label">City:</label>   <span class="fn editable" id="profile_edit_name" data-content="city"></span></p>
-           <p><label class="caller_profile_label">Zip:</label>   <span class="fn editable" id="profile_edit_name" data-content="postal_code"></span></p>
+          <p><label class="caller_profile_label">Number:</label>   <span class="fn editable" id="profile_edit_name">{{number}}</span></p> 
+           <p><label class="caller_profile_label">Name:</label>   <span class="fn editable" id="profile_edit_name">{{name}}</span></p>
+           <p><label class="caller_profile_label">Phone:</label>   <span class="fn editable" id="profile_edit_name">{{phonetype}}</span></p>
+           <p><label class="caller_profile_label">Carrier:</label>   <span class="fn editable" id="profile_edit_name" >{{carrier}}</span></p>
+           <p><label class="caller_profile_label">Type:</label>   <span class="fn editable" id="profile_edit_name" >{{persontype}}</span></p>
+           <p><label class="caller_profile_label">Addrress:</label>   <span class="fn editable" id="profile_edit_name" >{{address}}</span></p>
+           <p><label class="caller_profile_label">City:</label>   <span class="fn editable" id="profile_edit_name">{{city}}</span></p>
+           <p><label class="caller_profile_label">Zip:</label>   <span class="fn editable" id="profile_edit_name">{{postal_code}}</span></p>
          </div>
         </div>
       </div>  
       </script>
      
 
-    </script>   
+    </script>
+    <div id="calllog" onclick="hideCaller();">
+      <title>Call Log</title>
+    </div>
     <ul id="people"/>
+     
+   
   
   </body>
 </html>
