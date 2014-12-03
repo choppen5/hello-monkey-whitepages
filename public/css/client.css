@@ -1,19 +1,18 @@
 body {
   text-align: center;
   margin: 0;
-  background: url(https://static0.twilio.com/packages/quickstart/logo.png) top center no-repeat, url(https://static0.twilio.com/packages/quickstart/whitey.png) center top repeat;
+  background: url() top center no-repeat, url(https://static0.twilio.com/packages/quickstart/whitey.png) center top repeat;
 }
 
 #log {
   width: 466px;
-  height: 25px;
   background: #404040;
   padding: 10px;
-  /*margin-left: -243px;*/
+  font:  30px/normal sans-serif;
   margin: 25px auto 0 auto;
   border: 1px solid #d4d4d4;
   text-decoration: none;
-  font:18px/normal sans-serif;
+  font:30px/normal sans-serif;
   color: white;
   white-space: nowrap;
   outline: none;
@@ -47,7 +46,7 @@ body {
     list-style: none;
     font-family:'Helvetica','Arial';
     text-align: left;
-    background-color:#ee0000 !important;
+    background-color:#eeebeb;
     border:none !important;
     overflow: auto;
     overflow-x: hidden;
@@ -97,21 +96,7 @@ body {
 }
 
 
-#people li:HOVER {
-    color: #fff;
-    background-color:#dd0000!important;
-}
 
-#people li:ACTIVE {
-    color: #fff;
-    background-color:#C00 !important;
-}
-
-
-    
-#log {
-      font:  30px/normal sans-serif;
-}
     
 
 
@@ -158,6 +143,14 @@ body {
   letter-spacing:.1em;
   }
 
+.logos {
+  margin-top: 25px;
+}
+
+.logos div {
+  margin-top: 25px;
+}
+
 
 
 
@@ -182,7 +175,7 @@ button.call, button.hangup {
     display: inline-block;
     padding: 0.5em 1em;
     border: 1px solid #d4d4d4;
-    margin: 200px 0 0 0;
+    margin: 50px 0 0 0;
     text-decoration: none;
     text-shadow: 1px 1px 0 #fff;
     font:35px/normal sans-serif;
