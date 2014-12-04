@@ -102,7 +102,8 @@ body {
 
 .caller_profile_text {
   font-family: 'PT Sans', sans-serif;
-  overflow:auto;
+  font-size: 12;
+  overflow:hidden;
   color:#EDEDED;
   background:rgba(0,0,0,0.5);
   border-radius:12px;

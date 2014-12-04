@@ -89,7 +89,8 @@ def getnamefromwhitepages (phone)
     :postal_code => "",
     :lattitude => "",
     :longitude=> "",
-    :state=> "" }
+    :state=> "",
+    :spamscore=> "" }
 
   request_url = base_uri + version + "phone.json?phone="+ phone  +"&api_key="+api_key
   response = HTTParty.get(URI.escape(request_url))
@@ -100,6 +101,7 @@ def getnamefromwhitepages (phone)
     dictionarykeyphone = response['dictionary'][result]
     whitepagesobject[:phonetype] = dictionarykeyphone['line_type']
     whitepagesobject[:carrier]   = dictionarykeyphone['carrier']
+    whitepagesobject[:spamscore]  = dictionarykeyphone['reputation']['spam_score'] || 0
 
     if dictionarykeyphone['belongs_to'][0]
 
@@ -119,6 +121,7 @@ def getnamefromwhitepages (phone)
         end
 
       end  
+
     end
 
 
