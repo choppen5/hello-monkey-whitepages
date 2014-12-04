@@ -2,8 +2,13 @@ GEM
   remote: http://rubygems.org/
   specs:
     builder (3.2.2)
+    httparty (0.13.3)
+      json (~> 1.8)
+      multi_xml (>= 0.5.2)
+    json (1.8.1)
     jwt (1.0.0)
     multi_json (1.10.1)
+    multi_xml (0.5.5)
     rack (1.5.2)
     rack-protection (1.5.3)
       rack
@@ -21,5 +26,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  httparty
   sinatra
   twilio-ruby
