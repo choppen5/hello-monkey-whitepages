@@ -101,7 +101,7 @@ def getnamefromwhitepages (phone)
     dictionarykeyphone = response['dictionary'][result]
     whitepagesobject[:phonetype] = dictionarykeyphone['line_type']
     whitepagesobject[:carrier]   = dictionarykeyphone['carrier']
-    whitepagesobject[:spamscore]  = dictionarykeyphone['reputation']['spam_score'] || 0
+    whitepagesobject[:spamscore]  = dictionarykeyphone['reputation']['spam_score'] 
 
     if dictionarykeyphone['belongs_to'][0]
 
@@ -117,7 +117,7 @@ def getnamefromwhitepages (phone)
           whitepagesobject[:lastname]  = belongstoObject['names'][0]['last_name']
           whitepagesobject[:name] = "#{whitepagesobject[:firstname]} #{whitepagesobject[:lastname]}" 
         elsif whitepagesobject[:persontype] == "Business"
-          whitepagesobject[:name]  = belongstoObject['id'][0]['name']
+          whitepagesobject[:name]  = belongstoObject['id']['name']
         end
 
       end  
