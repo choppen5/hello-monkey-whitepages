@@ -117,7 +117,7 @@ def getnamefromwhitepages (phone)
           whitepagesobject[:lastname]  = belongstoObject['names'][0]['last_name']
           whitepagesobject[:name] = "#{whitepagesobject[:firstname]} #{whitepagesobject[:lastname]}" 
         elsif whitepagesobject[:persontype] == "Business"
-          whitepagesobject[:name]  = belongstoObject['id']['name']
+          whitepagesobject[:name]  = belongstoObject['name']
         end
 
       end  
