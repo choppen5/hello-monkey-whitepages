@@ -2,6 +2,8 @@ require 'rubygems'
 require 'sinatra'
 require 'twilio-ruby'
 require 'httparty'
+
+disable :protection
  
 # put your default Twilio Client name here, for when a phone number isn't given
 default_client = "charles"
@@ -10,6 +12,7 @@ caller_id   = ENV['twilio_caller_id']
 account_sid = ENV['twilio_account_sid']
 auth_token  = ENV['twilio_auth_token']
 appsid      = ENV['twilio_app_id']
+api_key     = ENV['whitepages_api_key']  
 
 get '/' do
     client_name = params[:client]
@@ -64,16 +67,17 @@ end
 
 post '/getname' do
     callerId = params[:callerId]
-    name = getnamefromwhitepages(callerId)
+    name = getnamefromwhitepages(callerId, api_key)
     return name
 end
 
 
-def getnamefromwhitepages (phone)
+def getnamefromwhitepages (phone, api_key)
    
    base_uri = "http://proapi.whitepages.com/"
    version = "2.0/" 
-   api_key = ENV['whitepages_api_key']  
+   
+
 
    #the whitepagesobject will be returned with availible info.. bare minimum phone
    whitepagesobject = {
